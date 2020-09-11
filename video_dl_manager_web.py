@@ -14,9 +14,7 @@ app = Flask(__name__)
 # Redis init
 redis_url = ''
 
-if len(sys.argv) > 2:
-    redis_url = sys.argv[2]
-elif 'REDIS_URL' in os.environ:
+if 'REDIS_URL' in os.environ:
     redis_url = os.environ['REDIS_URL']
 
 r = redis.Redis.from_url(redis_url)
