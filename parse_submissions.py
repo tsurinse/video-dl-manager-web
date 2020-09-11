@@ -1,7 +1,12 @@
 import os
+import pathlib
 import sys
 
 import redis
+
+
+# General
+ytdl_output_format = '%(title)s [%(id)s].%(ext)s'
 
 
 # Redis init
@@ -19,8 +24,17 @@ r = redis.Redis.from_url(redis_url)
 print('{} in queue'.format(len(r.keys())))
 
 for k in r.keys('*'):
-    print()
-    print(k.decode('UTF-8'), '->', r[k].decode('UTF-8'))
+    url  = k.decode('UTF-8')
+    dest = r[k].decode('UTF-8')
 
-    os.system('youtube-dl "{}" -o "{}"'.format(k.decode('UTF-8'), r[k].decode('UTF-8')))
+    if dest[-1] != '/':
+        dest += '/'
+
+    print()
+    print(url, '->', dest)
+
+    # Make directory path if it doesn't exist
+    pathlib.Path(dest).mkdir(parents=True, exist_ok=True)
+
+    os.system('youtube-dl "{}" -o "{}{}"'.format(url, dest, ytdl_output_format))
     r.delete(k)
